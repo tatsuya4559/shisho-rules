@@ -1,0 +1,30 @@
+version: '1'
+rules:
+  - id: versioned bucket without lifecycle rule
+    language: hcl
+    message: |
+      Versioned bucket should set lifecycle rule.
+    pattern: |
+      resource "aws_s3_bucket" :[NAME] {
+        :[...X]
+      }
+    constraints:
+      - target: X
+        should: match
+        pattern: |
+          versioning {
+            enabled = true
+          }
+      - target: X
+        should: not-match
+        pattern: |
+          lifecycle_rule {
+            :[...]
+          }
+    rewrite: |
+      resource "aws_s3_bucket" :[NAME] {
+        :[...X]
+        lifecycle_rule {
+          // any rule
+        }
+      }
